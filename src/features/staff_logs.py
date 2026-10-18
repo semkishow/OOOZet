@@ -31,7 +31,7 @@ async def print_message_deleted(msg):
   embed = discord.Embed(title='Usunięto wiadomość', colour=discord.Colour(0xff0000))
   embed.add_field(name=f'Użytkownik: ', value=f'<@{msg.author.id}>')
   embed.add_field(name=f'Kanał: ', value=f'<#{msg.channel.id}>')
-  embed.add_field(name=f'', value=_sanitize_content(msg.content), inline=False)
+  embed.add_field(name=f'', value=f'```{_sanitize_content(msg.content)}```', inline=False)
   if msg.poll:
     answers = ' '.join([f'\nOdpowiedź: `{answer.media.text}`' for answer in msg.poll.answers])
     embed.add_field(name='Ankieta: ', value=f'Pytanie: `{msg.poll.question}`{answers}', inline=False)
@@ -66,6 +66,7 @@ def _message_diff(before, after, diff_color: str = ANSI_GREEN):
       res[i] = ''
     elif s[0] == '+':
       res.insert(i, f'{diff_color}{s[-1]}{ANSI_CLEAR}')
+  if ''.join(res) == '': return ''
   return '```ansi\n' + ''.join(res) + '\n```'
 
 @event_listener
