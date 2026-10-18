@@ -16,7 +16,7 @@
 
 import discord, difflib
 
-from common import config, event_listener, RichText, RichChar
+from common import config, debacktick, event_listener, RichText, RichChar
 
 def render_attachments(attachments):
   return ' '.join([attachment.url for attachment in attachments])
@@ -44,6 +44,8 @@ async def on_message_delete(msg):
 # This diff only shows characters added to `after` and completely skips characters removed from `before`
 # This is expected behaviour for logging edits, but may be unwanted in other use cases
 def _message_diff(before, after):
+  before = debacktick(before)
+  after = debacktick(after)
   res = RichText(before)
   for i, s in enumerate(difflib.ndiff(before, after)):
     if s[0] == '-':
