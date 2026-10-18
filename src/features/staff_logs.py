@@ -70,3 +70,18 @@ async def on_message_edit(before, after):
     embed.add_field(name=f'Pliki po: ', value=f'{render_attachments(after.attachments)}', inline=False)
   embed.add_field(name='', value=f'{after.jump_url}', inline=False)
   await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
+
+@event_listener
+async def on_member_update(before, after):
+  if before.nick != after.nick:
+    embed = discord.Embed(title='Zmieniono nick użytkownika', colour=discord.Colour(0x777777))
+    embed.add_field(name=f'Użytkownik: ', value=f'<@{after.id}>')
+    if before.nick:
+      embed.add_field(name='Nick przed: ', value=f'{before.nick}', inline=False)
+    else:
+      embed.add_field(name='Nick przed: ', value=f'{before.global_name}', inline=False)
+    if after.nick:
+      embed.add_field(name='Nick po: ', value=f'{after.nick}', inline=False)
+    else:
+      embed.add_field(name='Nick po: ', value=f'{after.global_name}', inline=False)
+    await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
