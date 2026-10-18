@@ -117,4 +117,4 @@ async def on_member_update(before, after):
       embed.add_field(name='Nick po: ', value=f'{after.nick}', inline=False)
     else:
       embed.add_field(name='Nick po: ', value=f'{after.global_name}', inline=False)
-  await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
+    await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
