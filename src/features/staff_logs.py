@@ -16,7 +16,7 @@
 
 import discord, difflib
 
-from common import config, debacktick, event_listener, RichText, RichChar
+from common import config, debacktick, event_listener
 
 def render_attachments(attachments):
   return ' '.join([attachment.url for attachment in attachments])
@@ -25,7 +25,7 @@ async def print_message_deleted(msg):
   embed = discord.Embed(title='Usunięto wiadomość', colour=discord.Colour(0xff0000))
   embed.add_field(name=f'Użytkownik: ', value=f'<@{msg.author.id}>')
   embed.add_field(name=f'Kanał: ', value=f'<#{msg.channel.id}>')
-  embed.add_field(name=f'', value=f'{msg.content}', inline=False)
+  embed.add_field(name=f'', value=f'```ansi\n\x1b[31m{msg.content}\x1b[0m\n```', inline=False)
   if msg.poll:
     answers = ' '.join([f'\nOdpowiedź: `{answer.media.text}`' for answer in msg.poll.answers])
     embed.add_field(name='Ankieta: ', value=f'Pytanie: `{msg.poll.question}`{answers}', inline=False)
@@ -41,18 +41,22 @@ async def on_message_delete(msg):
     return
   await print_message_deleted(msg)
 
+ANSI_RED = '\x1b[31m'
+ANSI_GREEN = '\x1b[32m'
+ANSI_CLEAR = '\x1b[0m'
+
 # This diff only shows characters added to `after` and completely skips characters removed from `before`
 # This is expected behaviour for logging edits, but may be unwanted in other use cases
-def _message_diff(before, after):
+def _message_diff(before, after, diff_color: str = ANSI_RED):
   before = debacktick(before)
   after = debacktick(after)
-  res = RichText(before)
+  res = list(before)
   for i, s in enumerate(difflib.ndiff(before, after)):
     if s[0] == '-':
-      res.text[i] = RichChar()
+      res[i] = ''
     elif s[0] == '+':
-      res.text.insert(i, RichChar(s[-1], underline=True))
-  return str(res)
+      res.insert(i, f'{diff_color}{s[-1]}{ANSI_CLEAR}')
+  return '```ansi\n' + ''.join(res) + '\n```'
 
 @event_listener
 async def on_message_edit(before, after):
@@ -65,8 +69,8 @@ async def on_message_edit(before, after):
   embed.add_field(name=f'Użytkownik: ', value=f'<@{msg.author.id}>')
   embed.add_field(name=f'Kanał: ', value=f'<#{msg.channel.id}>')
   if before.content != after.content:
-    embed.add_field(name=f'Przed: ', value=f'{_message_diff(after.content, before.content)}', inline=False)
-    embed.add_field(name=f'Po: ', value=f'{_message_diff(before.content, after.content)}', inline=False)
+    embed.add_field(name=f'Przed: ', value=f'{_message_diff(after.content, before.content, diff_color=ANSI_RED)}', inline=False)
+    embed.add_field(name=f'Po: ', value=f'{_message_diff(before.content, after.content, diff_color=ANSI_GREEN)}', inline=False)
   if before.attachments != after.attachments:
     embed.add_field(name=f'Pliki przed: ', value=f'{render_attachments(before.attachments)}', inline=False)
     embed.add_field(name=f'Pliki po: ', value=f'{render_attachments(after.attachments)}', inline=False)
