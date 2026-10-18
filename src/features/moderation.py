@@ -193,7 +193,10 @@ async def purge(interaction, from_: str, to: str | None, user: discord.User | No
       limit=None,
     )
     for msg in purged_mesages:
-      await print_message_deleted(msg)
+      try:
+        await print_message_deleted(msg)
+      except:
+        log.exception(f'Got exception while logging message deleted')
     deletedc += len(purged_mesages)
     if to is not None and from_ != to:
       try:
