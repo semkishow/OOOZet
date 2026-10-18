@@ -162,6 +162,8 @@ config = {
   ],
   'lockout_invite_timeout': '3m',            # Czas, w którym wyzwanie musi zostać zaakceptowane. Czas ten jest też ograniczony z góry przez Discord.
   'lockout_refresh_cooldown': '30s',         # Odstęp czasu, po którym można ponownie odświeżyć widok pojedynku
+
+  'staff_logs_channel': None,                # Kanał, na który bot wysyła logi aktywności
 }
 
 def redacted_config():
@@ -401,3 +403,30 @@ def event_listener(func):
   assert not hasattr(func, '_is_event_listener')
   func._is_event_listener = True
   return func
+
+class RichChar:
+  def __init__(self, text: str = '', bold: bool = False, italic: bool = False, underline: bool = False, quote: bool = False):
+    self.text = text
+    self.bold = bold
+    self.italic = italic
+    self.underline = underline
+    self.quote = quote
+
+class RichText:
+  def __init__(self, plain_text: str = ''):
+    self.text = [RichChar(c) for c in plain_text]
+
+  def __str__(self) -> str:
+    res = ''
+    last_char = RichChar()
+    for c in self.text:
+      if c.bold != last_char.bold: res += '**'
+      if c.italic != last_char.italic: res += '*'
+      if c.underline != last_char.underline: res += '__'
+      if c.quote and not last_char.quote: res += '> '
+      res += c.text
+      last_char = c
+    if last_char.bold: res += '**'
+    if last_char.italic: res += '*'
+    if last_char.underline: res += '__'
+    return res
