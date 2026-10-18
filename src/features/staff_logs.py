@@ -23,25 +23,24 @@ def _sanitize_content(message):
 
 def _render_content(content):
   if content == '': return ''
-  return '```ansi\n' + _sanitize_content(content) + '\n```'
+  return '```ansi\n' + content + '\n```'
 
 def _render_attachments(attachments):
   return ' '.join([attachment.url for attachment in attachments])
 
-def _render_embed(embed):
-  return f'{embed.title}\n{embed.description}'
+def _render_embeds(embeds):
+  return '\n'.join([f'{embed.title}\n{embed.description}' for embed in embeds])
 
 async def print_message_deleted(msg):
   embed = discord.Embed(title='Usunięto wiadomość', colour=discord.Colour(0xff0000))
   embed.add_field(name=f'Użytkownik: ', value=f'<@{msg.author.id}>')
   embed.add_field(name=f'Kanał: ', value=f'<#{msg.channel.id}>')
-  embed.add_field(name=f'', value=_render_content(msg.content), inline=False)
+  embed.add_field(name=f'', value=_render_content(_sanitize_content(msg.content)), inline=False)
   if msg.poll:
     answers = ' '.join([f'\nOdpowiedź: `{answer.media.text}`' for answer in msg.poll.answers])
     embed.add_field(name='Ankieta: ', value=f'Pytanie: `{msg.poll.question}`{answers}', inline=False)
   if len(msg.embeds) > 0:
-    for embed in msg.embeds:
-      embed.add_field(name='', value=_render_embed(embed), inline=False)
+    embed.add_field(name='Embedy: ', value=_render_embeds(msg.embeds), inline=False)
   if msg.reference:
     referenced_msg = await bot.get_channel(msg.reference.channel_id).fetch_message(msg.reference.message_id)
     embed.add_field(name='Przywołana wiadomość: ', value=referenced_msg.jump_url, inline=False)
@@ -54,9 +53,6 @@ async def print_message_deleted(msg):
 
 @event_listener
 async def on_message_delete(msg):
-  member = msg.author
-  if member.bot or msg.is_system() or msg.guild is None or msg.guild.id != config['guild']:
-    return
   await print_message_deleted(msg)
 
 ANSI_RED = '\x1b[31m'
@@ -91,9 +87,8 @@ async def on_message_edit(before, after):
     embed.add_field(name=f'Przed: ', value=f'{_message_diff(after.content, before.content, diff_color=ANSI_RED)}', inline=False)
     embed.add_field(name=f'Po: ', value=f'{_message_diff(before.content, after.content, diff_color=ANSI_GREEN)}', inline=False)
   if before.embeds != after.embeds:
-    embed.add_field(name='')
-    for embed in msg.embeds:
-      embed.add_field(name='', value=_render_embed(embed), inline=False)
+    embed.add_field(name='Embedy przed: ', value=_render_embeds(before.embeds), inline=False)
+    embed.add_field(name='Embedy po: ', value=_render_embeds(after.embeds), inline=False)
   if before.reference != after.reference:
     reference_before = await bot.get_channel(before.reference.channel_id).fetch_message(before.reference.message_id)
     embed.add_field(name='Przywołana wiadomość przed: ', value=reference_before.jump_url, inline=False)
