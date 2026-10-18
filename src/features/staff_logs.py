@@ -21,6 +21,10 @@ from common import config, debacktick, event_listener
 def _sanitize_content(message):
   return debacktick(message).replace('\x1b', '')
 
+def _render_content(content):
+  if content == '': return ''
+  return '```ansi\n' + _sanitize_content(content) + '\n```'
+
 def _render_attachments(attachments):
   return ' '.join([attachment.url for attachment in attachments])
 
@@ -31,7 +35,7 @@ async def print_message_deleted(msg):
   embed = discord.Embed(title='Usunięto wiadomość', colour=discord.Colour(0xff0000))
   embed.add_field(name=f'Użytkownik: ', value=f'<@{msg.author.id}>')
   embed.add_field(name=f'Kanał: ', value=f'<#{msg.channel.id}>')
-  embed.add_field(name=f'', value=f'```{_sanitize_content(msg.content)}```', inline=False)
+  embed.add_field(name=f'', value=_render_content(msg.content), inline=False)
   if msg.poll:
     answers = ' '.join([f'\nOdpowiedź: `{answer.media.text}`' for answer in msg.poll.answers])
     embed.add_field(name='Ankieta: ', value=f'Pytanie: `{msg.poll.question}`{answers}', inline=False)
@@ -42,6 +46,8 @@ async def print_message_deleted(msg):
     referenced_msg = await bot.get_channel(msg.reference.channel_id).fetch_message(msg.reference.message_id)
     embed.add_field(name='Przywołana wiadomość: ', value=referenced_msg.jump_url, inline=False)
   if msg.attachments:
+    if len(msg.attachments) > 0:
+      embed.set_image(url=msg.attachments[0].url)
     embed.add_field(name=f'Pliki: ', value=f'{_render_attachments(msg.attachments)}', inline=False)
   embed.add_field(name='', value=msg.jump_url, inline=False)
   await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
@@ -66,8 +72,7 @@ def _message_diff(before, after, diff_color: str = ANSI_GREEN):
       res[i] = ''
     elif s[0] == '+':
       res.insert(i, f'{diff_color}{s[-1]}{ANSI_CLEAR}')
-  if ''.join(res) == '': return ''
-  return '```ansi\n' + ''.join(res) + '\n```'
+  return _render_content(''.join(res))
 
 @event_listener
 async def on_message_edit(before, after):
@@ -95,6 +100,10 @@ async def on_message_edit(before, after):
     reference_after = await bot.get_channel(after.reference.channel_id).fetch_message(after.reference.message_id)
     embed.add_field(name='Przywołana wiadomość po: ', value=reference_after.jump_url, inline=False)
   if before.attachments != after.attachments:
+    if len(after.attachments) > 0:
+      embed.set_image(url=after.attachments[0].url)
+    elif len(before.attachments) > 0:
+      embed.set_image(url=before.attachments[0].url)
     embed.add_field(name=f'Pliki przed: ', value=f'{_render_attachments(before.attachments)}', inline=False)
     embed.add_field(name=f'Pliki po: ', value=f'{_render_attachments(after.attachments)}', inline=False)
   embed.add_field(name='', value=f'{after.jump_url}', inline=False)
