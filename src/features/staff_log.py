@@ -17,9 +17,9 @@
 import discord, difflib
 from io import BytesIO
 
-EMBED_FIELD_LIMIT = 1024
-
 from common import config, event_listener
+
+EMBED_FIELD_LIMIT = 1024
 
 def _sanitize_content(message):
   return message.replace('`', '\u2060`').replace('\x1b', '')
