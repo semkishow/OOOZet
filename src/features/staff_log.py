@@ -42,7 +42,7 @@ async def log_deleted_message(msg):
 
   content = _render_content(_sanitize_content(msg.content))
   if len(content) > EMBED_FIELD_LIMIT:
-    files.append(discord.File(BytesIO(str.encode(msg.content)), "message.txt"))
+    files.append(discord.File(BytesIO(str.encode(msg.content)), 'message.txt'))
   else:
     embed.add_field(name='', value=content, inline=False)
 
@@ -62,12 +62,14 @@ async def log_deleted_message(msg):
       embed.set_image(url=msg.attachments[0].url)
     else:
       embed.add_field(name='Załączniki: ', value=_render_attachments(msg.attachments), inline=False)
+
   await bot.get_channel(config['staff_logs_channel']).send(embed=embed, files=files)
 
 @event_listener
 async def on_message_delete(msg):
   if msg.author.bot or msg.is_system() or msg.guild is None or msg.guild.id != config['guild']:
     return
+
   await log_deleted_message(msg)
 
 ANSI_RED = '\x1b[31m'
@@ -119,13 +121,13 @@ async def on_message_edit(before, after):
   if before_content != after_content:
     before_rendered = _highlight_chars_added(after_content, before_content, color=ANSI_RED)
     if len(before_rendered) > EMBED_FIELD_LIMIT:
-      files.append(discord.File(BytesIO(str.encode(before.content)), "before.txt"))
+      files.append(discord.File(BytesIO(str.encode(before.content)), 'before.txt'))
     else:
       embed.add_field(name='Przed: ', value=before_rendered, inline=False)
 
     after_rendered = _highlight_chars_added(before_content, after_content, color=ANSI_GREEN)
     if len(after_rendered) > EMBED_FIELD_LIMIT:
-      files.append(discord.File(BytesIO(str.encode(after.content)), "after.txt"))
+      files.append(discord.File(BytesIO(str.encode(after.content)), 'after.txt'))
     else:
       embed.add_field(name='Po: ', value=after_rendered, inline=False)
 
