@@ -163,7 +163,7 @@ config = {
   'lockout_invite_timeout': '3m',            # Czas, w którym wyzwanie musi zostać zaakceptowane. Czas ten jest też ograniczony z góry przez Discord.
   'lockout_refresh_cooldown': '30s',         # Odstęp czasu, po którym można ponownie odświeżyć widok pojedynku
 
-  'staff_logs_channel': None,                # Kanał, na który bot wysyła logi aktywności
+  'staff_log_channel': None,                 # Kanał, na który bot wysyła logi dla administracji
 }
 
 def redacted_config():
