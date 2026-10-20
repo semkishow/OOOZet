@@ -63,7 +63,7 @@ async def log_deleted_message(msg):
     else:
       embed.add_field(name='Załączniki: ', value=_render_attachments(msg.attachments), inline=False)
 
-  await bot.get_channel(config['staff_logs_channel']).send(embed=embed, files=files)
+  await bot.get_channel(config['staff_log_channel']).send(embed=embed, files=files)
 
 @event_listener
 async def on_message_delete(msg):
@@ -149,7 +149,7 @@ async def on_message_edit(before, after):
     embed.add_field(name='Załączniki przed: ', value=_render_attachments(before.attachments), inline=False)
     embed.add_field(name='Załączniki po: ', value=_render_attachments(after.attachments), inline=False)
 
-  await bot.get_channel(config['staff_logs_channel']).send(embed=embed, files=files)
+  await bot.get_channel(config['staff_log_channel']).send(embed=embed, files=files)
 
 @event_listener
 async def on_member_update(before, after):
@@ -165,4 +165,4 @@ async def on_member_update(before, after):
     embed.add_field(name='Nick po: ', value=after.nick, inline=False)
   else:
     embed.add_field(name='Nick po: ', value=after.global_name, inline=False)
-  await bot.get_channel(config['staff_logs_channel']).send(embed=embed)
+  await bot.get_channel(config['staff_log_channel']).send(embed=embed)
