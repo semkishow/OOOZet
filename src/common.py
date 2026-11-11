@@ -166,7 +166,7 @@ config = {
   'staff_log_channel': None,                 # Kanał, na który bot wysyła logi dla administracji
 
   'sticky_default_cooldown': '1m',           # Domyślny minimalny odstęp czasu pomiędzy kolejnymi wiadomościami
-  'sticky_cooldown_choices': [               # Możliwe wybory odstępów czasu pomiędzy kolejnymi wiadomościami
+  'sticky_cooldown_choices': [               # Możliwe wybory minimalnego odstępu czasu pomiędzy kolejnymi wiadomościami
     ['5 sekund', '5s'],
     ['15 sekund', '15s'],
     ['30 sekund', '30s'],

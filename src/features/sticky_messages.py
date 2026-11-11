@@ -56,7 +56,7 @@ sticky = app_commands.Group(name='sticky', description='Komendy do przypiętych 
 
 @sticky.command(name='set', description='Ustawia przypiętą wiadomość na aktualnym kanale')
 @app_commands.rename(value='wiadomość')
-@app_commands.describe(value='Tekst przypiętej wiadomości')
+@app_commands.describe(value='Treść przypiętej wiadomości')
 @app_commands.describe(cooldown='Minimalny odstęp czasu pomiędzy kolejnymi wiadomościami')
 @app_commands.choices(cooldown=[app_commands.Choice(name=label, value=duration) for label, duration in config['sticky_cooldown_choices']])
 async def cmd_set(interaction, value: str, cooldown: str = config['sticky_default_cooldown']):
