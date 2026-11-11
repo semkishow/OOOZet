@@ -19,6 +19,7 @@ from discord import app_commands
 
 import database
 from common import config, event_listener, parse_duration
+from features.utils import check_staff
 
 # This is more accurate, than TextChannel.last_message_id for some reason, so we just use it.
 async def _get_last_message(channel):
@@ -59,6 +60,7 @@ sticky = app_commands.Group(name='sticky', description='Komendy do przypiętych 
 @app_commands.describe(value='Treść przypiętej wiadomości')
 @app_commands.describe(cooldown='Minimalny odstęp czasu pomiędzy kolejnymi wiadomościami')
 @app_commands.choices(cooldown=[app_commands.Choice(name=label, value=duration) for label, duration in config['sticky_cooldown_choices']])
+@check_staff('zmiany przypiętych wiadomości')
 async def cmd_set(interaction, value: str, cooldown: str = config['sticky_default_cooldown']):
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['value'] = value
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['cooldown'] = cooldown
@@ -70,16 +72,19 @@ async def cmd_set(interaction, value: str, cooldown: str = config['sticky_defaul
 @sticky.command(name='set-cooldown', description='Ustawia minimalny odstęp czasu pomiędzy kolejnymi wiadomościami')
 @app_commands.describe(cooldown='Minimalny odstęp czasu pomiędzy kolejnymi wiadomościami')
 @app_commands.choices(cooldown=[app_commands.Choice(name=label, value=duration) for label, duration in config['sticky_cooldown_choices']])
+@check_staff('zmiany przypiętych wiadomości')
 async def cmd_set_cooldown(interaction, cooldown: str):
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['cooldown'] = cooldown
   await interaction.response.send_message(f'Pomyślnie ustawiono cooldown na {cooldown} 🫡', ephemeral=True)
 
 @sticky.command(name='pause', description='Zatrymuje wysyłanie przypiętych wiadomości')
+@check_staff('zmiany przypiętych wiadomości')
 async def cmd_pause(interaction):
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['active'] = False
   await interaction.response.send_message('Pomyślnie zatrzymano wysyłanie przypiętych wiadomości 🫡', ephemeral=True)
 
 @sticky.command(name='resume', description='Ponawia wysyłanie przypiętych wiadomości')
+@check_staff('zmiany przypiętych wiadomości')
 async def cmd_resume(interaction):
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['active'] = True
   await interaction.response.send_message('Pomyślnie ponowiono wysyłanie przypiętych wiadomości 🫡', ephemeral=True)
