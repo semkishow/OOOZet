@@ -30,8 +30,6 @@ def _compute_love(a: str, b: str):
 
 @app_commands.command(description='Wyświetla kompatybilność dwóch nazw')
 async def love(interaction, a: str, b: str):
-  a = a.lower()
-  b = b.lower()
   embed = discord.Embed(title=f'{a} & {b}', colour=discord.Colour.red())
-  embed.add_field(name=f'{_compute_love(a, b)}%', value='')
+  embed.add_field(name=f'{_compute_love(a.lower(), b.lower())}%', value='')
   await interaction.response.send_message(embed=embed)
