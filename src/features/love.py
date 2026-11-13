@@ -18,8 +18,8 @@ import discord
 from discord import app_commands
 
 def _miau_hash(val: str):
-  EXP = 313
-  MOD = 1729375007
+  EXP = 443
+  MOD = 694202137
   hash = 0
   for c in val:
     hash = (hash * EXP + ord(c)) % MOD
@@ -28,7 +28,7 @@ def _miau_hash(val: str):
 def _compute_love(a: str, b: str):
   return (_miau_hash(a) ^ _miau_hash(b)) % 101
 
-@app_commands.command(description='love')
+@app_commands.command(description='Wyświetla kompatybilność dwóch nazw')
 async def love(interaction, a: str, b: str):
   embed = discord.Embed(title=f'{a} & {b}', colour=discord.Colour.red())
   embed.add_field(name=f'{_compute_love(a, b)}%', value='')
