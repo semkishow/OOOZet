@@ -121,5 +121,5 @@ async def cmd_pause(interaction):
 async def cmd_resume(interaction):
   log.info(f'Resuming the sticky message in channel {interaction.channel.id}')
   database.data.setdefault('sticky_messages', {}).setdefault(interaction.channel.id, {})['active'] = True
-  await interaction.response.send_message('Pomyślnie ponowiono wysyłanie przypiętej wiadomości 🫡', ephemeral=True)
   await _update_sticky(interaction.channel)
+  await interaction.response.send_message('Pomyślnie ponowiono wysyłanie przypiętej wiadomości 🫡', ephemeral=True)
