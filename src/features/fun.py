@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import discord
 from discord import app_commands
+
+from common import debacktick
 
 def _miau_hash(val: str):
   EXP = 443
@@ -26,13 +27,25 @@ def _miau_hash(val: str):
   return hash
 
 def _prepare_input(val: str):
-  return val.lower().strip()
+  return val.casefold().strip()
 
 def _compute_love(a: str, b: str):
   return (_miau_hash(_prepare_input(a)) ^ _miau_hash(_prepare_input(b))) % 101
 
-@app_commands.command(description='Wyświetla kompatybilność dwóch nazw')
+@app_commands.command(description='Oblicza kompatybilność dwóch rzeczy')
 async def love(interaction, a: str, b: str):
-  embed = discord.Embed(title=f'{a} & {b}', colour=discord.Colour.red())
-  embed.add_field(name='Kompatybilność:', value=f'{_compute_love(a, b)}%')
-  await interaction.response.send_message(embed=embed)
+  content = ''
+  content += f'Kompatybilność `{debacktick(a)}` i `{debacktick(b)}`:\n'
+  love = _compute_love(a, b)
+  # The only emoji here that can be replaced with a Unicode symbol is
+  # `:broken_heart:`, so I just left everything as Discord names.
+  if love == 100:
+    content += ':cupid:'
+  elif love >= 80:
+    content += ':sparkling_heart:'
+  elif love >= 50:
+    content += ':heart:'
+  else:
+    content += ':broken_heart:'
+  content += f' {love}%'
+  await interaction.response.send_message(content)
